@@ -1,0 +1,9 @@
+ag2[openai]
+pyautogen
+chromadb
+sentence-transformers
+langchain-tavily
+langchain-core
+streamlit
+python-dotenv
+requests
