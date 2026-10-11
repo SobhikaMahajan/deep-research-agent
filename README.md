@@ -70,7 +70,7 @@ Research/
 
 ---
 
-## 5. Agent Conversation Flow
+## 3. Agent Conversation Flow
 
 ```
 User Query
@@ -113,31 +113,31 @@ User Query
 
 ---
 
-## 6. Key Design Patterns
+## 4. Key Design Patterns
 
-### 6.1 Streaming via Message Queue
+### 4.1 Streaming via Message Queue
 - `StreamlitCallbackHandler` patches `ConversableAgent.send` at runtime
 - Intercepts messages from specific agents, serializes as JSON, puts in `MessageQueueHandler`
 - Streamlit's main thread polls the queue in `render_response_stream()`
 - `None` sentinel signals end of stream
 
-### 6.2 Thread Safety
+### 4.2 Thread Safety
 - Agent processing runs in a daemon thread (`threading.Thread`)
 - Communication via `queue.Queue` (thread-safe)
 - Session state managed by Streamlit's built-in mechanism
 
-### 6.3 Tool Registration
+### 4.3 Tool Registration
 - AG2's `register_function` requires module-level functions (not methods)
 - `tool_registry.py` uses a module-level singleton `_search_tools_instance` to bridge this
 - Module-level functions delegate to the singleton's methods
 
-### 6.4 Reasoning with Tree of Thoughts
+### 4.4 Reasoning with Tree of Thoughts
 - `plan_web_search` creates a temporary `ReasoningAgent` with LATS method
 - Config: `{"method": "lats", "nsim": 3, "max_depth": 4}`
 - The reasoning agent generates a strategic plan
 - A separate `subquery_generation_agent` converts the plan to actionable search queries (JSON)
 
-### 6.5 Domain Filtering (Tavily)
+### 4.5 Domain Filtering (Tavily)
 - Auto-detects company names in queries using regex word-boundary matching
 - When company detected: only allows results from company's official domains + trusted sources
 - Always blocks social media / job sites (LinkedIn, Reddit, etc.)
@@ -145,7 +145,7 @@ User Query
 
 ---
 
-## 7. Key Dependencies (requirements.txt — essential ones)
+## 5. Key Dependencies (requirements.txt — essential ones)
 
 ```
 ag2                          # Microsoft AutoGen v2 (multi-agent framework)
@@ -161,7 +161,7 @@ requests                     # HTTP client (for auth)
 
 ---
 
-## 8. How to Run
+## 6. How to Run
 
 ```bash
 # Install dependencies
@@ -178,7 +178,7 @@ python main.py "Compare MX750 VS GE Healthcare products in patient monitoring"
 
 ---
 
-## 9. Legacy Files (for reference, not used in main flow)
+## 7. Legacy Files (for reference, not used in main flow)
 
 ### `orchestration.py` — Original monolithic orchestration
 Contains the original non-modular implementation with all agents, tools, and orchestration in one file. The refactored version splits this into `agents/`, `orchestration/`, `services/`, and `tools/` packages.
@@ -188,32 +188,32 @@ Contains the raw prompt strings (reasoning_prompt, subquery_prompt, internal_pro
 
 ---
 
-## 10. Important Implementation Details
+## 8. Important Implementation Details
 
-### 10.1 Azure Search Index Schema
+### 8.1 Azure Search Index Schema
 The Azure AI Search index uses these field names:
 - `name`, `content`, `metadata` (JSON string), `page_number`, `path`
 - `sharepoint_link`, `base_folder`, `document_type`, `product_family` (collection)
 - Semantic configuration: `competition-semantic-config-v1`
 
-### 10.2 LLM Configuration
+### 8.2 LLM Configuration
 - Model: `gpt-4o` via Azure OpenAI
 - Temperature: `0.0` (deterministic)
 - Authentication: Azure AD token provider (client credentials flow, not API key)
 - Token auto-refreshes with 5-minute expiry buffer
 
-### 10.3 GroupChat Settings
+### 8.3 GroupChat Settings
 - `max_round=60` — allows extensive multi-turn conversations
 - Custom `speaker_selection_method` (callable `SpeakerSelector` instance)
 - `GroupChatManager` wraps the chat with LLM config
 
-### 10.4 ReasoningAgent Configuration
+### 8.4 ReasoningAgent Configuration
 - Uses LATS (Language Agent Tree Search) method
 - `nsim=3` — number of simulations
 - `max_depth=4` — maximum reasoning depth
 - `silent=False` — outputs reasoning to console
 
-### 10.5 Content Processing in UI
+### 8.5 Content Processing in UI
 - Agent reasoning content: HTML-escaped, heading sizes reduced (# → ###)
 - Final answer: rendered as raw HTML in `<div class="final-answer">`
 - Response latency tracked and displayed
@@ -221,7 +221,7 @@ The Azure AI Search index uses these field names:
 
 ---
 
-## 11. Package `__init__.py` Files
+## 9. Package `__init__.py` Files
 
 ### `agents/__init__.py`
 ```python
